@@ -1,0 +1,245 @@
+[gd_scene load_steps=9 format=2]
+
+[ext_resource path="res://themes/White_Theme.tres" type="Theme" id=1]
+[ext_resource path="res://Main.gd" type="Script" id=2]
+[ext_resource path="res://fonts/DroidSans_font.tres" type="DynamicFont" id=3]
+[ext_resource path="res://fonts/DroidSans.ttf" type="DynamicFontData" id=4]
+
+[sub_resource type="StyleBoxFlat" id=1]
+bg_color = Color( 0.847059, 0.847059, 0.847059, 1 )
+
+[sub_resource type="DynamicFont" id=2]
+use_mipmaps = true
+font_data = ExtResource( 4 )
+
+[sub_resource type="DynamicFont" id=4]
+use_mipmaps = true
+font_data = ExtResource( 4 )
+
+[sub_resource type="DynamicFont" id=3]
+use_mipmaps = true
+font_data = ExtResource( 4 )
+
+[node name="Main" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+rect_min_size = Vector2( 300, 150 )
+mouse_filter = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme = ExtResource( 1 )
+script = ExtResource( 2 )
+
+[node name="Background" type="Panel" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+custom_styles/panel = SubResource( 1 )
+
+[node name="TopBar" type="Control" parent="."]
+margin_right = 1024.0
+margin_bottom = 32.0
+rect_min_size = Vector2( 0, 32 )
+mouse_filter = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="TopBarBackground" type="Panel" parent="TopBar"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+rect_min_size = Vector2( 0, 28 )
+mouse_filter = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="MenuBar" type="HBoxContainer" parent="TopBar"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+rect_min_size = Vector2( 1000, 28 )
+size_flags_horizontal = 3
+size_flags_vertical = 3
+custom_constants/separation = 15
+
+[node name="FileMenu" type="MenuButton" parent="TopBar/MenuBar"]
+margin_right = 35.0
+margin_bottom = 32.0
+custom_fonts/font = ExtResource( 3 )
+text = "File"
+flat = false
+switch_on_hover = true
+
+[node name="EditMenu" type="MenuButton" parent="TopBar/MenuBar"]
+margin_left = 50.0
+margin_right = 86.0
+margin_bottom = 32.0
+custom_fonts/font = ExtResource( 3 )
+text = "Edit"
+switch_on_hover = true
+
+[node name="OptionsMenu" type="MenuButton" parent="TopBar/MenuBar"]
+margin_left = 101.0
+margin_right = 168.0
+margin_bottom = 32.0
+custom_fonts/font = SubResource( 2 )
+text = "Options"
+switch_on_hover = true
+
+[node name="ThemeMenu" type="MenuButton" parent="TopBar/MenuBar"]
+margin_left = 183.0
+margin_right = 251.0
+margin_bottom = 32.0
+custom_fonts/font = SubResource( 4 )
+text = "Themes"
+switch_on_hover = true
+
+[node name="HelpMenu" type="MenuButton" parent="TopBar/MenuBar"]
+margin_left = 266.0
+margin_right = 311.0
+margin_bottom = 32.0
+custom_fonts/font = SubResource( 3 )
+text = "Help"
+switch_on_hover = true
+
+[node name="MiddleBar" type="Control" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_top = 34.0
+margin_bottom = -30.0
+mouse_filter = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Tabs" type="Tabs" parent="MiddleBar"]
+margin_left = 30.0
+margin_top = 6.0
+margin_right = 1019.0
+margin_bottom = 33.0
+tab_align = 0
+tab_close_display_policy = 2
+drag_to_rearrange_enabled = true
+
+[node name="TextEdit" type="TextEdit" parent="MiddleBar"]
+visible = false
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 5.0
+margin_top = 32.0
+margin_right = -5.0
+margin_bottom = 2.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+custom_fonts/font = ExtResource( 3 )
+custom_colors/caret_color = Color( 0.223529, 0.215686, 0.215686, 1 )
+custom_colors/font_color_selected = Color( 0.0784314, 0.0666667, 0.0666667, 1 )
+custom_colors/font_color = Color( 0, 0, 0, 1 )
+caret_blink = true
+
+[node name="NewTabButton" type="Button" parent="MiddleBar"]
+margin_left = 6.0
+margin_top = 5.0
+margin_right = 29.0
+margin_bottom = 30.0
+hint_tooltip = "Create New Editor Tab"
+text = "+"
+
+[node name="BottomBar" type="Control" parent="."]
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_top = -24.0
+margin_bottom = 1.0
+rect_min_size = Vector2( 0, 25 )
+mouse_filter = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="BottomBarBackground" type="Panel" parent="BottomBar"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+rect_min_size = Vector2( 0, 25 )
+mouse_filter = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="BottomBar"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+alignment = 2
+
+[node name="LetterCount" type="Label" parent="BottomBar/HBoxContainer"]
+margin_left = 770.0
+margin_right = 895.0
+margin_bottom = 25.0
+rect_min_size = Vector2( 125, 0 )
+text = "Characters: 0"
+
+[node name="LineCount" type="Label" parent="BottomBar/HBoxContainer"]
+margin_left = 899.0
+margin_right = 1024.0
+margin_bottom = 25.0
+rect_min_size = Vector2( 125, 0 )
+text = "Lines: 0"
+
+[node name="OpenFileDialog" type="FileDialog" parent="."]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -375.0
+margin_top = -212.5
+margin_right = 375.0
+margin_bottom = 212.5
+window_title = "Open a File"
+resizable = true
+mode = 0
+access = 2
+show_hidden_files = true
+current_dir = "E:/Google Drive/Game Dev/Projects/Godot/Text Editor"
+current_path = "E:/Google Drive/Game Dev/Projects/Godot/Text Editor/"
+
+[node name="SaveFileDialog" type="FileDialog" parent="."]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -375.0
+margin_top = -212.5
+margin_right = 375.0
+margin_bottom = 212.5
+resizable = true
+access = 2
+current_dir = "E:/Google Drive/Game Dev/Projects/Godot/Text Editor"
+current_path = "E:/Google Drive/Game Dev/Projects/Godot/Text Editor/"
+
+[node name="AboutMenuDialog" type="WindowDialog" parent="."]
+editor/display_folded = true
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -160.5
+margin_top = -105.0
+margin_right = 160.5
+margin_bottom = 105.0
+window_title = "About"
+resizable = true
+
+[node name="Description" type="Label" parent="AboutMenuDialog"]
+margin_left = 5.0
+margin_top = 24.0
+margin_right = 316.0
+margin_bottom = 49.0
+text = "A Basic Tabbed Text Editor"
+
+[node name="CreatedBy" type="Label" parent="AboutMenuDialog"]
+margin_left = 5.0
+margin_top = 49.0
+margin_right = 316.0
+margin_bottom = 74.0
+text = "Created by MrBlack"
+
+[connection signal="tab_changed" from="MiddleBar/Tabs" to="." method="_on_Tabs_tab_changed"]
+[connection signal="tab_clicked" from="MiddleBar/Tabs" to="." method="_on_Tabs_tab_clicked"]
+[connection signal="tab_close" from="MiddleBar/Tabs" to="." method="_on_Tabs_tab_close"]
+[connection signal="tab_hover" from="MiddleBar/Tabs" to="." method="_on_Tabs_tab_hover"]
+[connection signal="text_changed" from="MiddleBar/TextEdit" to="." method="_on_TextEdit_text_changed"]
+[connection signal="pressed" from="MiddleBar/NewTabButton" to="." method="_on_NewTabButton_pressed"]
+[connection signal="file_selected" from="OpenFileDialog" to="." method="_on_OpenFileDialog_file_selected"]
+[connection signal="file_selected" from="SaveFileDialog" to="." method="_on_SaveFileDialog_file_selected"]
