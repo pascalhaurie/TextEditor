@@ -29,6 +29,9 @@ var current_tab = 0
 func _ready():
 	get_tree().connect("files_dropped", self, "_on_files_dropped_into_window")
 	
+	yield(get_tree(), "idle_frame")
+	$CreditsDialog/ScrollContainer.scroll_vertical = 1500
+	
 	$OpenFileDialog.set_filters(App.FILE_TYPES)
 	tabs.set_select_with_rmb(true)
 	
@@ -374,3 +377,6 @@ func _on_Tabs_tab_close(tab):
 
 func _on_TextEdit_text_changed():
 	update_text_stats()
+
+func _on_CreditsButton_pressed():
+	$CreditsDialog.popup()

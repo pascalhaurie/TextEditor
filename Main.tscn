@@ -211,26 +211,98 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-margin_left = -160.5
-margin_top = -105.0
-margin_right = 160.5
-margin_bottom = 105.0
+margin_left = -240.5
+margin_top = -138.5
+margin_right = 240.5
+margin_bottom = 138.5
 window_title = "About"
 resizable = true
 
-[node name="Description" type="Label" parent="AboutMenuDialog"]
+[node name="VBoxContainer" type="VBoxContainer" parent="AboutMenuDialog"]
+editor/display_folded = true
+anchor_right = 1.0
+anchor_bottom = 1.0
 margin_left = 5.0
-margin_top = 24.0
-margin_right = 316.0
-margin_bottom = 49.0
-text = "A Basic Tabbed Text Editor"
+margin_top = 32.5
+margin_right = -6.0
+margin_bottom = -96.5
 
-[node name="CreatedBy" type="Label" parent="AboutMenuDialog"]
-margin_left = 5.0
-margin_top = 49.0
-margin_right = 316.0
-margin_bottom = 74.0
-text = "Created by MrBlack"
+[node name="Title" type="Label" parent="AboutMenuDialog/VBoxContainer"]
+margin_right = 470.0
+margin_bottom = 25.0
+text = "TextEditor Alpha v1.0"
+align = 1
+
+[node name="CreatedBy" type="Label" parent="AboutMenuDialog/VBoxContainer"]
+margin_top = 29.0
+margin_right = 470.0
+margin_bottom = 54.0
+text = "Created By: MrBlack"
+
+[node name="Description" type="Label" parent="AboutMenuDialog/VBoxContainer"]
+margin_top = 58.0
+margin_right = 470.0
+margin_bottom = 83.0
+text = "A basic Text Editor with Tabs and Drag and Drop."
+autowrap = true
+
+[node name="CreditsButton" type="Button" parent="AboutMenuDialog"]
+margin_left = 370.5
+margin_top = 217.5
+margin_right = 450.5
+margin_bottom = 252.5
+text = "Credits"
+
+[node name="CreditsDialog" type="WindowDialog" parent="."]
+editor/display_folded = true
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -214.0
+margin_top = -230.0
+margin_right = 210.0
+margin_bottom = 253.0
+mouse_filter = 2
+window_title = "Credits"
+resizable = true
+
+[node name="ScrollContainer" type="ScrollContainer" parent="CreditsDialog"]
+margin_left = 13.0
+margin_top = 18.0
+margin_right = 415.0
+margin_bottom = 474.0
+mouse_default_cursor_shape = 6
+size_flags_vertical = 3
+scroll_horizontal_enabled = false
+
+[node name="Control" type="Control" parent="CreditsDialog/ScrollContainer"]
+margin_right = 400.0
+margin_bottom = 1000.0
+rect_min_size = Vector2( 400, 1000 )
+mouse_filter = 2
+
+[node name="GodotCredits" type="Label" parent="CreditsDialog/ScrollContainer/Control"]
+margin_left = 38.0
+margin_top = 18.0
+margin_right = 390.0
+margin_bottom = 703.0
+text = "Godot Engine:
+
+Copyright (c) 2007-2019 Juan Linietsky, Ariel Manzur. Copyright (c) 2014-2019 Godot Engine contributors.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+
+
+FreeFont:
+
+Portions of this software are copyright © <year> The FreeType Project (www.freetype.org). All rights reserved."
+autowrap = true
 
 [connection signal="tab_changed" from="MiddleBar/Tabs" to="." method="_on_Tabs_tab_changed"]
 [connection signal="tab_clicked" from="MiddleBar/Tabs" to="." method="_on_Tabs_tab_clicked"]
@@ -240,3 +312,4 @@ text = "Created by MrBlack"
 [connection signal="pressed" from="MiddleBar/NewTabButton" to="." method="_on_NewTabButton_pressed"]
 [connection signal="file_selected" from="OpenFileDialog" to="." method="_on_OpenFileDialog_file_selected"]
 [connection signal="file_selected" from="SaveFileDialog" to="." method="_on_SaveFileDialog_file_selected"]
+[connection signal="pressed" from="AboutMenuDialog/CreditsButton" to="." method="_on_CreditsButton_pressed"]
