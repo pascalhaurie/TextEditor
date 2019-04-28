@@ -27,7 +27,7 @@ var current_tab = 0
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	$OpenFileDialog.set_filters(PoolStringArray(["*.txt ; Text Document","*.html ; Hyper Text Markup Lang.", "*.css ; Cascading Style Sheets", "*.php : PHP"]))
+	$OpenFileDialog.set_filters(App.FILE_TYPES)
 	tabs.set_select_with_rmb(true)
 	
 	populate_file_menu()
@@ -38,6 +38,13 @@ func _ready():
 	
 	update_editor_tabs()
 	update_text_stats()
+	
+	open_file_window.set_current_dir("/")
+	open_file_window.set_current_file("/")
+	open_file_window.set_current_path("/")
+	save_file_window.set_current_dir("/")
+	save_file_window.set_current_file("/")
+	save_file_window.set_current_path("/")
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):
@@ -123,14 +130,18 @@ func new_file():
 	$BottomBar/LineCount.text = "Lines: " + str(get_node("MiddleBar/Untitled"+str(current_tab)).get_line_count())
 
 func save_file():
-	var path = App.current_file
-	if path == "Untitled":
+	if $OpenFileDialog.current_file == "":
 		save_file_window.popup()
 		
 	else:
 		var file = File.new()
-		file.open(path, 2)
-		file.store_string(get_node("MiddleBar/Untitled"+str(current_tab)).text)
+		var text_to_save = get_node("MiddleBar/"+str(App.current_files[current_tab])).text
+		var current_file = $OpenFileDialog.current_file
+		
+		print(str(get_node("MiddleBar/"+str(App.current_files[current_tab])).name))
+		
+		file.open(str(current_file,".txt"), File.WRITE)
+		file.store_string(text_to_save)
 		file.close()
 
 func open_file():
@@ -167,6 +178,8 @@ func create_new_tab(tab_title, tab_id):
 	$MiddleBar.add_child(new_text_edit)
 	new_text_edit.show()
 	update_editor()
+	update_editor_tabs()
+	App.update_window_title(current_tab)
 
 func change_tab(tab_id):
 	var new_tab = tab_id
@@ -182,6 +195,7 @@ func change_tab(tab_id):
 	
 	current_tab = tab_id
 	update_editor()
+	App.update_window_title(current_tab)
 
 func update_editor():
 	for i in tabs.get_tab_count():
@@ -203,11 +217,11 @@ func _on_file_menu_item_pressed(id):
 			new_file()
 		1:
 			open_file_window.popup()
-		2:
-			save_file()
 		3:
-			save_file_window.popup()
+			save_file()
 		4:
+			save_file_window.popup()
+		6:
 			get_tree().quit()
 
 func _on_edit_menu_item_pressed(id):
@@ -289,10 +303,9 @@ func _on_OpenFileDialog_file_selected(path):
 	
 	file.close()
 	
-	App.update_window_title(current_tab)
-	
 	get_node("MiddleBar/Untitled"+str(current_tab)).name = App.current_file_name
 	update_editor_tabs()
+	App.update_window_title(current_tab)
 	$BottomBar/HBoxContainer/LineCount.text = "Lines: " + str(get_node("MiddleBar/"+str(App.current_file_name)).get_line_count())
 
 func _on_SaveFileDialog_file_selected(path):
@@ -308,6 +321,7 @@ func _on_NewTabButton_pressed():
 	get_node("MiddleBar/"+App.current_files[tab_count_id]).show()
 	
 	tabs.current_tab = tab_count_id
+	update_editor_tabs()
 
 func _on_Tabs_tab_clicked(tab):
 	change_tab(tab)
@@ -317,6 +331,7 @@ func _on_Tabs_tab_hover(tab):
 
 func _on_Tabs_tab_changed(tab):
 	update_text_stats()
+	App.update_window_title(current_tab)
 
 func _on_Tabs_tab_close(tab):
 	if tab_count_id == 0:
