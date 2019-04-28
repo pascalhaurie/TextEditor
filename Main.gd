@@ -50,6 +50,9 @@ func populate_file_menu():
 	for i in App.FILE_MENU_OPTIONS:
 		file_popup.add_item(i)
 	
+	file_popup.set_item_as_separator(2, true)
+	file_popup.set_item_as_separator(5, true)
+	
 	file_popup.rect_min_size = Vector2(200, 30)
 	#file_popup.set_item_shortcut(0, menu_shortcut(KEY_N))
 	#file_popup.set_item_shortcut(1, menu_shortcut(KEY_O))
@@ -60,19 +63,30 @@ func populate_edit_menu():
 	
 	for i in App.EDIT_MENU_OPTIONS:
 		edit_popup.add_item(i)
+		
+	
+	edit_popup.set_item_as_separator(3, true)
+	edit_popup.set_item_as_separator(6, true)
 	
 	edit_popup.rect_min_size = Vector2(200, 30)
 
 func populate_options_menu():
 	options_popup = options_menu.get_popup()
-	
 	options_popup.connect("id_pressed", self, "_on_options_menu_item_pressed")
 	
-	options_popup.add_check_item("Show Line Numbers", 0)
-	options_popup.set_item_checked(0, text_edit.show_line_numbers)
+	for i in App.OPTIONS_MENU_OPTIONS:
+		options_popup.add_check_item(i)
 	
-	options_popup.add_check_item("Word Wrap", 1)
-	options_popup.set_item_checked(0, text_edit.wrap_enabled)
+	options_popup.set_item_as_checkable(4, false)
+	options_popup.set_item_as_separator(4, true)
+	
+	options_popup.set_item_checked(0, App.data["Settings"]["Fullscreen"])
+	options_popup.set_item_checked(1, App.data["Settings"]["Maximized"])
+	options_popup.set_item_checked(2, App.data["Settings"]["Always_on_Top"])
+	options_popup.set_item_checked(3, App.data["Settings"]["Keep_Screen_On"])
+	
+	options_popup.set_item_checked(5, App.data["Settings"]["Show_Line_Numbers"])
+	options_popup.set_item_checked(6, App.data["Settings"]["Enable_Word_Wrap"])
 	
 	options_popup.rect_min_size = Vector2(200, 30)
 
@@ -81,13 +95,13 @@ func populate_theme_menu():
 	theme_popup.connect("id_pressed", self, "_on_theme_menu_item_pressed")
 	
 	theme_popup.add_check_item("White Theme", 0)
-	if App.current_theme == "White Theme":
+	if App.data["Settings"]["Current_Theme"] == "White Theme":
 		theme_popup.set_item_checked(0, true)
 	else:
 		theme_popup.set_item_checked(0, false)
 	
 	theme_popup.add_check_item("Grey Theme", 1)
-	if App.current_theme == "Grey Theme":
+	if App.data["Settings"]["Current_Theme"] == "Grey Theme":
 		theme_popup.set_item_checked(1, true)
 	else:
 		theme_popup.set_item_checked(1, false)
@@ -104,9 +118,9 @@ func populate_help_menu():
 
 func new_file():
 	text_edit.text = ""
-	App.current_file = "Untitled"
-	App.update_window_title()
-	$BottomBar/LineCount.text = "Lines: " + str(text_edit.get_line_count())
+	App.current_files = "Untitled"
+	App.update_window_title(current_tab)
+	$BottomBar/LineCount.text = "Lines: " + str(get_node("MiddleBar/Untitled"+str(current_tab)).get_line_count())
 
 func save_file():
 	var path = App.current_file
@@ -134,13 +148,19 @@ func menu_shortcut(key):
 
 func update_editor_tabs():
 	if tabs.get_tab_count() == 0:
-		var path = App.current_file
-		if path == "Untitled":
-			create_new_tab("Untitled", tab_count_id)
+		if App.current_files.size() <= 0:
+			App.current_files[0] = "Untitled"
+			create_new_tab(App.current_files[0], tab_count_id)
+	else:
+		for j in App.current_files.size():
+			tabs.set_tab_title(j, App.current_files[j])
 
 func create_new_tab(tab_title, tab_id):
 	var new_text_edit = text_edit.duplicate()
-	new_text_edit.name = str(tab_title,tab_id)
+	
+	App.current_files[tab_id] = tab_title+str(tab_id)
+	
+	new_text_edit.name = str(App.current_files[tab_id])
 	#new_text_edit.rect_size = Vector2(1014, 500)
 	
 	tabs.add_tab(tab_title)
@@ -150,22 +170,32 @@ func create_new_tab(tab_title, tab_id):
 
 func change_tab(tab_id):
 	var new_tab = tab_id
+	var current_tab_file = App.current_files[tab_id]
 	
-	if get_node("MiddleBar/Untitled"+str(current_tab)) != null:
-		get_node("MiddleBar/Untitled"+str(current_tab)).hide()
+	if get_node("MiddleBar/"+App.current_files[current_tab]) != null:
+		get_node("MiddleBar/"+App.current_files[current_tab]).hide()
 	
-	get_node("MiddleBar/Untitled"+str(new_tab)).show()
+	if current_tab_file == "Untitled":
+		get_node("MiddleBar/Untitled"+str(new_tab)).show()
+	else:
+		get_node("MiddleBar/"+current_tab_file).show()
+	
 	current_tab = tab_id
 	update_editor()
 
 func update_editor():
 	for i in tabs.get_tab_count():
-		get_node("MiddleBar/Untitled"+str(i)).show_line_numbers = App.show_line_numbers
-		get_node("MiddleBar/Untitled"+str(i)).wrap_enabled = App.enable_word_wrap
+		for j in $MiddleBar.get_children():
+			if j.get_class() == "TextEdit":
+				get_node("MiddleBar/"+j.name).show_line_numbers = App.data["Settings"]["Show_Line_Numbers"]
+				get_node("MiddleBar/"+j.name).wrap_enabled = App.data["Settings"]["Enable_Word_Wrap"]
 
 func update_text_stats():
-	letter_count.text = "Characters: " + str(get_node("MiddleBar/Untitled"+str(tabs.get_current_tab())).text.length())
-	line_count.text = "Lines: " + str(get_node("MiddleBar/Untitled"+str(tabs.get_current_tab())).get_line_count())
+	for i in tabs.get_tab_count():
+		for j in $MiddleBar.get_children():
+			if j.get_class() == "TextEdit":
+				letter_count.text = "Characters: " + str(get_node("MiddleBar/"+j.name).text.length())
+				line_count.text = "Lines: " + str(get_node("MiddleBar/"+j.name).get_line_count())
 
 func _on_file_menu_item_pressed(id):
 	match id:
@@ -183,48 +213,87 @@ func _on_file_menu_item_pressed(id):
 func _on_edit_menu_item_pressed(id):
 	match id:
 		0:
-			pass
+			get_node("MiddleBar/Untitled"+str(tabs.get_current_tab())).cut()
+		1:
+			get_node("MiddleBar/Untitled"+str(tabs.get_current_tab())).copy()
+		2:
+			get_node("MiddleBar/Untitled"+str(tabs.get_current_tab())).paste()
+		4:
+			get_node("MiddleBar/Untitled"+str(tabs.get_current_tab())).select_all()
+		5:
+			get_node("MiddleBar/Untitled"+str(tabs.get_current_tab())).select_all()
+			get_node("MiddleBar/Untitled"+str(tabs.get_current_tab())).cut()
+		7:
+			get_node("MiddleBar/Untitled"+str(tabs.get_current_tab())).undo()
+		8:
+			get_node("MiddleBar/Untitled"+str(tabs.get_current_tab())).redo()
 
 func _on_options_menu_item_pressed(id):
 	match id:
 		0:
-			App.show_line_numbers = !App.show_line_numbers
-			update_editor()
+			App.data["Settings"]["Fullscreen"] = !App.data["Settings"]["Fullscreen"]
+			OS.window_fullscreen = App.data["Settings"]["Fullscreen"]
 		1:
-			App.enable_word_wrap = !App.enable_word_wrap
+			App.data["Settings"]["Maximized"] = !App.data["Settings"]["Maximized"]
+			OS.window_maximized = App.data["Settings"]["Maximized"]
+		2:
+			App.data["Settings"]["Always_on_Top"] = !App.data["Settings"]["Always_on_Top"]
+			OS.set_window_always_on_top(App.data["Settings"]["Always_on_Top"])
+		3:
+			App.data["Settings"]["Keep_Screen_On"] = !App.data["Settings"]["Keep_Screen_On"]
+			OS.keep_screen_on = App.data["Settings"]["Keep_Screen_On"]
+		5:
+			App.data["Settings"]["Show_Line_Numbers"] = !App.data["Settings"]["Show_Line_Numbers"]
+			update_editor()
+		6:
+			App.data["Settings"]["Enable_Word_Wrap"] = !App.data["Settings"]["Enable_Word_Wrap"]
 			update_editor()
 	
-	options_popup.set_item_checked(0, App.show_line_numbers)
-	options_popup.set_item_checked(1, App.enable_word_wrap)
+	options_popup.set_item_checked(0, App.data["Settings"]["Fullscreen"])
+	options_popup.set_item_checked(1, App.data["Settings"]["Maximized"])
+	options_popup.set_item_checked(2, App.data["Settings"]["Always_on_Top"])
+	options_popup.set_item_checked(3, App.data["Settings"]["Keep_Screen_On"])
+	
+	options_popup.set_item_checked(5, App.data["Settings"]["Show_Line_Numbers"])
+	options_popup.set_item_checked(6, App.data["Settings"]["Enable_Word_Wrap"])
+	
+	App.save_data()
 
 func _on_theme_menu_item_pressed(id):
 	match id:
 		0:
-			App.current_theme = "White Theme"
+			App.data["Settings"]["Current_Theme"] = "White Theme"
 			$"/root/Main".theme = load("res://themes/White_Theme.tres")
 			theme_popup.set_item_checked(0, true)
 			theme_popup.set_item_checked(1, false)
 		1:
-			App.current_theme = "Grey Theme"
+			App.data["Settings"]["Current_Theme"] = "Grey Theme"
 			$"/root/Main".theme = load("res://themes/Grey_Theme.tres")
 			theme_popup.set_item_checked(0, false)
 			theme_popup.set_item_checked(1, true)
+	
+	App.save_data()
 
 func _on_about_menu_item_pressed(id):
 	match id:
 		0:
 			about_menu_window.popup()
-		1:
-			pass
 
 func _on_OpenFileDialog_file_selected(path):
 	var file = File.new()
 	file.open(path, 1)
-	text_edit.text = file.get_as_text()
+	
+	get_node("MiddleBar/Untitled"+str(current_tab)).text = file.get_as_text()
+	App.current_file_name = open_file_window.get_current_file().replace(".txt", "")
+	App.current_files[current_tab] = App.current_file_name
+	
 	file.close()
-	App.current_file = path
-	App.update_window_title()
-	$BottomBar/LineCount.text = "Lines: " + str(text_edit.get_line_count())
+	
+	App.update_window_title(current_tab)
+	
+	get_node("MiddleBar/Untitled"+str(current_tab)).name = App.current_file_name
+	update_editor_tabs()
+	$BottomBar/HBoxContainer/LineCount.text = "Lines: " + str(get_node("MiddleBar/"+str(App.current_file_name)).get_line_count())
 
 func _on_SaveFileDialog_file_selected(path):
 	var file = File.new()
@@ -235,7 +304,9 @@ func _on_SaveFileDialog_file_selected(path):
 func _on_NewTabButton_pressed():
 	tab_count_id += 1
 	create_new_tab("Untitled", tab_count_id)
-	get_node("MiddleBar/Untitled"+str(tab_count_id)).show()
+	
+	get_node("MiddleBar/"+App.current_files[tab_count_id]).show()
+	
 	tabs.current_tab = tab_count_id
 
 func _on_Tabs_tab_clicked(tab):
@@ -253,11 +324,12 @@ func _on_Tabs_tab_close(tab):
 		get_node("MiddleBar/Untitled"+str(tab_count_id)).cut()
 		
 	else:
-		get_node("MiddleBar/Untitled"+str(tab)).queue_free()
+		get_node("MiddleBar/"+str(App.current_files[tab])).queue_free()
+		App.current_files.erase(tab)
 		tabs.remove_tab(tab)
 		tab_count_id -= 1
 		
-		get_node("MiddleBar/Untitled"+str(tab_count_id)).show()
+		get_node("MiddleBar/"+App.current_files[tab_count_id]).show()
 
 func _on_TextEdit_text_changed():
 	update_text_stats()
