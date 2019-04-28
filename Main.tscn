@@ -188,9 +188,8 @@ window_title = "Open a File"
 resizable = true
 mode = 0
 access = 2
-show_hidden_files = true
-current_dir = "E:/Google Drive/Game Dev/Projects/Godot/Text Editor"
-current_path = "E:/Google Drive/Game Dev/Projects/Godot/Text Editor/"
+current_dir = "E:/"
+current_path = "E:/"
 
 [node name="SaveFileDialog" type="FileDialog" parent="."]
 anchor_left = 0.5

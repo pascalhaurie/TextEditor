@@ -27,6 +27,8 @@ var current_tab = 0
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	get_tree().connect("files_dropped", self, "_on_files_dropped_into_window")
+	
 	$OpenFileDialog.set_filters(App.FILE_TYPES)
 	tabs.set_select_with_rmb(true)
 	
@@ -211,6 +213,29 @@ func update_text_stats():
 				letter_count.text = "Characters: " + str(get_node("MiddleBar/"+j.name).text.length())
 				line_count.text = "Lines: " + str(get_node("MiddleBar/"+j.name).get_line_count())
 
+func _on_files_dropped_into_window(files, screen):
+	var file = File.new()
+	if get_node("MiddleBar/"+str(App.current_files[current_tab])).text == "":
+		file.open(files[0], 1)
+		get_node("MiddleBar/"+str(App.current_files[current_tab])).text = file.get_as_text()
+		get_node("MiddleBar/Untitled"+str(current_tab)).name = App.current_file_name
+		App.current_file_name = open_file_window.get_current_file().replace(".txt", "")
+		App.current_files[current_tab] = App.current_file_name
+		file.close()
+		
+		update_editor()
+		update_text_stats()
+		App.update_window_title(current_tab)
+	else:
+		tab_count_id += 1
+		file.open(files, 1)
+		create_new_tab("Untitled", tab_count_id)
+		get_node("MiddleBar/"+str(App.current_files[tab_count_id])).text = file.get_as_text()
+		get_node("MiddleBar/Untitled"+str(current_tab)).name = App.current_file_name
+		App.current_file_name = open_file_window.get_current_file().replace(".txt", "")
+		App.current_files[current_tab] = App.current_file_name
+		file.close()
+
 func _on_file_menu_item_pressed(id):
 	match id:
 		0:
@@ -298,6 +323,7 @@ func _on_OpenFileDialog_file_selected(path):
 	file.open(path, 1)
 	
 	get_node("MiddleBar/Untitled"+str(current_tab)).text = file.get_as_text()
+	
 	App.current_file_name = open_file_window.get_current_file().replace(".txt", "")
 	App.current_files[current_tab] = App.current_file_name
 	
